@@ -77,6 +77,7 @@ class SSHExecutor(RemoteExecutor):
         username: str,
         hostname: str,
         ssh_key_file: str = None,
+        ssh_config: str = None,
         cache_dir: str = None,
         python_path: str = "",
         conda_env: str = None,
@@ -107,7 +108,7 @@ class SSHExecutor(RemoteExecutor):
         self.cache_dir = str(Path(self.cache_dir).expanduser().resolve())
 
         self.run_local_on_ssh_fail = run_local_on_ssh_fail
-
+        self.ssh_config = ssh_config
         self.remote_workdir = remote_workdir or get_config("executors.ssh.remote_workdir")
         self.create_unique_workdir = (
             get_config("executors.ssh.create_unique_workdir")
@@ -265,6 +266,7 @@ class SSHExecutor(RemoteExecutor):
                     username=self.username,
                     client_keys=[self.ssh_key_file],
                     known_hosts=None,
+                    config=self.ssh_config,
                 )
             except _retry_errs as err:
 
@@ -509,7 +511,7 @@ class SSHExecutor(RemoteExecutor):
         if self.conda_env:
             app_log.debug(f"Verifying if conda env {self.conda_env} exists")
             completed_proc = await conn.run(
-                f'eval "$(conda shell.bash hook)" && conda env list | grep {self.conda_env}'
+                f'eval conda env list | grep {self.conda_env}'
             )
 
             if completed_proc.returncode != 0:
