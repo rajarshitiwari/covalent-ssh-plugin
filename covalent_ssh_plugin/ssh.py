@@ -40,6 +40,7 @@ _EXECUTOR_PLUGIN_DEFAULTS = {
     "username": "",
     "hostname": "",
     "ssh_key_file": os.path.join(os.environ["HOME"], ".ssh/id_rsa"),
+    "ssh_config": os.path.join(os.environ["HOME"], ".ssh/config"),
     "cache_dir": str(Path(get_config("dispatcher.cache_dir")).expanduser().resolve()),
     "python_path": "python",
     "conda_env": "",
@@ -108,7 +109,7 @@ class SSHExecutor(RemoteExecutor):
         self.cache_dir = str(Path(self.cache_dir).expanduser().resolve())
 
         self.run_local_on_ssh_fail = run_local_on_ssh_fail
-        self.ssh_config = ssh_config
+        self.ssh_config = ssh_config or get_config("executors.ssh.ssh_config")
         self.remote_workdir = remote_workdir or get_config("executors.ssh.remote_workdir")
         self.create_unique_workdir = (
             get_config("executors.ssh.create_unique_workdir")
