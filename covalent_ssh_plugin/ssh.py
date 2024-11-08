@@ -377,7 +377,8 @@ class SSHExecutor(RemoteExecutor):
         cmd = f"{self.python_path} {remote_script_file}"
 
         if self.conda_env:
-            cmd = f'eval "$(conda shell.bash hook)" && conda activate {self.conda_env} && {cmd}'
+            #cmd = f'eval "$(conda shell.bash hook)" && conda activate {self.conda_env} && {cmd}' # why do we need to init every time?
+            cmd = f'eval conda activate {self.conda_env} && {cmd}'
 
         app_log.debug(f"Running the function on remote now with command: {cmd}")
         result = await conn.run(cmd)
